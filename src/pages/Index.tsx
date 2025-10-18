@@ -20,18 +20,77 @@ interface Product {
   thickness: string;
   wearClass: string;
   inStock: boolean;
+  country?: string;
+  wood?: string;
+  width?: number;
+  length?: number;
+  hasPad?: boolean;
+  pattern?: string;
+  bevel?: string;
+  brushed?: boolean;
+  finish?: string;
+  sheen?: string;
+  shade?: string;
+  color?: string;
+  selection?: string;
+  waterproof?: boolean;
+  underfloorHeating?: boolean;
 }
 
 const categories = [
   { id: 'all', name: 'Все товары', icon: 'LayoutGrid' },
-  { id: 'parquet', name: 'Паркетная доска', icon: 'Layers' },
   { id: 'laminate', name: 'Ламинат', icon: 'Grid3x3' },
-  { id: 'linoleum', name: 'Линолеум', icon: 'Waves' },
-  { id: 'vinyl', name: 'Виниловые покрытия', icon: 'Square' },
-  { id: 'baseboard', name: 'Плинтусы', icon: 'RectangleHorizontal' }
+  { id: 'vinyl', name: 'Кварц винил', icon: 'Square' },
+  { id: 'parquet', name: 'Паркетная доска', icon: 'Layers' },
+  { id: 'engineered', name: 'Инженерная доска', icon: 'PanelTop' },
+  { id: 'solid', name: 'Массивная доска', icon: 'Box' },
+  { id: 'cork', name: 'Пробковое покрытие', icon: 'Circle' },
+  { id: 'modular', name: 'Модульный паркет', icon: 'Grid2x2' },
+  { id: 'piece', name: 'Штучный паркет', icon: 'RectangleVertical' },
+  { id: 'underlay', name: 'Подложка', icon: 'Minus' },
+  { id: 'baseboard', name: 'Плинтус', icon: 'RectangleHorizontal' },
+  { id: 'glue', name: 'Клей для паркета', icon: 'Droplet' },
+  { id: 'varnish', name: 'Паркетный лак', icon: 'PaintBucket' },
+  { id: 'oil', name: 'Масло для паркета', icon: 'Droplets' },
+  { id: 'primer', name: 'Грунтовка для паркета', icon: 'Brush' },
+  { id: 'care', name: 'Средства по уходу', icon: 'Sparkles' },
+  { id: 'sealant', name: 'Герметик для паркета', icon: 'Cylinder' },
+  { id: 'tools', name: 'Инструменты для укладки', icon: 'Wrench' },
+  { id: 'plywood', name: 'Фанера', icon: 'FileStack' },
+  { id: 'putty', name: 'Шпаклёвка по дереву', icon: 'Paintbrush' }
 ];
 
-const manufacturers = ['Tarkett', 'Quick-Step', 'Kronospan', 'Barlinek', 'Pergo', 'Egger'];
+const manufacturers = ['Tarkett', 'Quick-Step', 'Kronospan', 'Barlinek', 'Pergo', 'Egger', 'ADESIV', 'BERGER-SIEDLE', 'LOBA'];
+
+const countries = [
+  'Австрия', 'Беларусь', 'Бельгия', 'Германия', 'Испания', 'Китай', 
+  'Норвегия', 'Польша', 'Россия', 'Турция', 'Франция'
+];
+
+const woodTypes = [
+  'Дуб', 'Ясень', 'Бук', 'Бамбук', 'Венге', 'Тик', 'Палисандр', 'Орех', 
+  'Мербау', 'Акация', 'Клён', 'Берёза', 'Ироко', 'Вишня', 'Вяз', 'Сосна', 'Ятоба'
+];
+
+const wearClasses = ['31 класс', '32 класс', '33 класс', '34 класс'];
+
+const patterns = [
+  'Однополосный', 'Двухполосный', 'Трёхполосный', 'Многополосный', 
+  'Ёлочкой', 'С рисунком', 'Под плитку, камень'
+];
+
+const bevels = ['Фаска 4v', 'Минифаска 4v', 'Фаска 2v', 'Без фаски'];
+
+const sheens = ['Матовый', 'Полуматовый (стандартный)', 'Глянцевый', 'Полуглянцевый'];
+
+const shades = ['Светлый оттенок', 'Средний оттенок', 'Тёмный оттенок'];
+
+const colors = [
+  'белые / бежевые оттенки цвета', 'Коричневые / красные оттенки цвета',
+  'Натуральные оттенки цвета', 'Серые оттенки цвета', 'Чёрные / тёмные оттенки цвета'
+];
+
+const selections = ['Кантри', 'Рустик', 'Натур', 'Селект'];
 
 const products: Product[] = [
   {
@@ -131,8 +190,25 @@ interface CartItem extends Product {
 export default function Index() {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [priceRange, setPriceRange] = useState<number[]>([0, 5000]);
+  const [priceRange, setPriceRange] = useState<number[]>([0, 10000]);
   const [selectedManufacturers, setSelectedManufacturers] = useState<string[]>([]);
+  const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
+  const [selectedWood, setSelectedWood] = useState<string[]>([]);
+  const [selectedWearClass, setSelectedWearClass] = useState<string[]>([]);
+  const [thicknessRange, setThicknessRange] = useState<[string, string]>(['', '']);
+  const [widthRange, setWidthRange] = useState<[string, string]>(['', '']);
+  const [lengthRange, setLengthRange] = useState<[string, string]>(['', '']);
+  const [hasPad, setHasPad] = useState<string>('all');
+  const [selectedPattern, setSelectedPattern] = useState<string[]>([]);
+  const [selectedBevel, setSelectedBevel] = useState<string[]>([]);
+  const [brushed, setBrushed] = useState<string>('all');
+  const [selectedSheen, setSelectedSheen] = useState<string[]>([]);
+  const [selectedShade, setSelectedShade] = useState<string[]>([]);
+  const [selectedColor, setSelectedColor] = useState<string[]>([]);
+  const [selectedSelection, setSelectedSelection] = useState<string[]>([]);
+  const [waterproof, setWaterproof] = useState<string>('all');
+  const [underfloorHeating, setUnderfloorHeating] = useState<string>('all');
+  
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [roomLength, setRoomLength] = useState<string>('');
@@ -143,8 +219,18 @@ export default function Index() {
     const categoryMatch = selectedCategory === 'all' || product.category === selectedCategory;
     const priceMatch = product.price >= priceRange[0] && product.price <= priceRange[1];
     const manufacturerMatch = selectedManufacturers.length === 0 || selectedManufacturers.includes(product.manufacturer);
+    const countryMatch = selectedCountries.length === 0 || (product.country && selectedCountries.includes(product.country));
+    const woodMatch = selectedWood.length === 0 || (product.wood && selectedWood.includes(product.wood));
+    const wearClassMatch = selectedWearClass.length === 0 || selectedWearClass.includes(product.wearClass);
     const searchMatch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-    return categoryMatch && priceMatch && manufacturerMatch && searchMatch;
+    
+    const thicknessMin = thicknessRange[0] ? parseFloat(thicknessRange[0]) : 0;
+    const thicknessMax = thicknessRange[1] ? parseFloat(thicknessRange[1]) : Infinity;
+    const thicknessVal = parseFloat(product.thickness);
+    const thicknessMatch = thicknessVal >= thicknessMin && thicknessVal <= thicknessMax;
+    
+    return categoryMatch && priceMatch && manufacturerMatch && countryMatch && 
+           woodMatch && wearClassMatch && thicknessMatch && searchMatch;
   });
 
   const addToCart = (product: Product) => {
@@ -190,6 +276,53 @@ export default function Index() {
     } else {
       setSelectedManufacturers([...selectedManufacturers, manufacturer]);
     }
+  };
+
+  const toggleCountry = (country: string) => {
+    if (selectedCountries.includes(country)) {
+      setSelectedCountries(selectedCountries.filter(c => c !== country));
+    } else {
+      setSelectedCountries([...selectedCountries, country]);
+    }
+  };
+
+  const toggleWood = (wood: string) => {
+    if (selectedWood.includes(wood)) {
+      setSelectedWood(selectedWood.filter(w => w !== wood));
+    } else {
+      setSelectedWood([...selectedWood, wood]);
+    }
+  };
+
+  const toggleWearClass = (wearClass: string) => {
+    if (selectedWearClass.includes(wearClass)) {
+      setSelectedWearClass(selectedWearClass.filter(w => w !== wearClass));
+    } else {
+      setSelectedWearClass([...selectedWearClass, wearClass]);
+    }
+  };
+
+  const resetFilters = () => {
+    setSelectedCategory('all');
+    setPriceRange([0, 10000]);
+    setSelectedManufacturers([]);
+    setSelectedCountries([]);
+    setSelectedWood([]);
+    setSelectedWearClass([]);
+    setThicknessRange(['', '']);
+    setWidthRange(['', '']);
+    setLengthRange(['', '']);
+    setHasPad('all');
+    setSelectedPattern([]);
+    setSelectedBevel([]);
+    setBrushed('all');
+    setSelectedSheen([]);
+    setSelectedShade([]);
+    setSelectedColor([]);
+    setSelectedSelection([]);
+    setWaterproof('all');
+    setUnderfloorHeating('all');
+    setSearchQuery('');
   };
 
   return (
@@ -400,62 +533,227 @@ export default function Index() {
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-4 gap-6">
             <aside className="lg:col-span-1">
-              <Card className="sticky top-20">
-                <CardContent className="p-6 space-y-6">
-                  <div>
-                    <h4 className="font-semibold mb-4 flex items-center gap-2">
+              <Card className="sticky top-20 max-h-[calc(100vh-100px)]">
+                <CardContent className="p-6">
+                  <div className="mb-4">
+                    <h4 className="font-semibold flex items-center gap-2">
                       <Icon name="SlidersHorizontal" size={18} />
-                      Фильтры
+                      Подбор по параметрам
                     </h4>
                   </div>
 
-                  <div>
-                    <h4 className="font-semibold mb-4 text-sm">Цена, ₽/м²</h4>
-                    <Slider 
-                      min={0}
-                      max={5000}
-                      step={100}
-                      value={priceRange}
-                      onValueChange={setPriceRange}
-                      className="mb-4"
-                    />
-                    <div className="flex justify-between text-sm text-muted-foreground">
-                      <span>{priceRange[0]} ₽</span>
-                      <span>{priceRange[1]} ₽</span>
+                  <div className="overflow-y-auto max-h-[calc(100vh-280px)] pr-2 space-y-6" style={{ scrollbarWidth: 'thin' }}>
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Бренд</h4>
+                      <div className="space-y-2 max-h-40 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                        {manufacturers.map(manufacturer => (
+                          <div key={manufacturer} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`brand-${manufacturer}`}
+                              checked={selectedManufacturers.includes(manufacturer)}
+                              onCheckedChange={() => toggleManufacturer(manufacturer)}
+                            />
+                            <label htmlFor={`brand-${manufacturer}`} className="text-sm cursor-pointer">
+                              {manufacturer}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
 
-                  <div>
-                    <h4 className="font-semibold mb-4 text-sm">Производитель</h4>
-                    <div className="space-y-3">
-                      {manufacturers.map(manufacturer => (
-                        <div key={manufacturer} className="flex items-center space-x-2">
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Страна производителя</h4>
+                      <div className="space-y-2 max-h-40 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                        {countries.map(country => (
+                          <div key={country} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`country-${country}`}
+                              checked={selectedCountries.includes(country)}
+                              onCheckedChange={() => toggleCountry(country)}
+                            />
+                            <label htmlFor={`country-${country}`} className="text-sm cursor-pointer">
+                              {country}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Порода дерева</h4>
+                      <div className="space-y-2 max-h-40 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                        {woodTypes.map(wood => (
+                          <div key={wood} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`wood-${wood}`}
+                              checked={selectedWood.includes(wood)}
+                              onCheckedChange={() => toggleWood(wood)}
+                            />
+                            <label htmlFor={`wood-${wood}`} className="text-sm cursor-pointer">
+                              {wood}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Класс износостойкости</h4>
+                      <div className="space-y-2">
+                        {wearClasses.map(wc => (
+                          <div key={wc} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`wear-${wc}`}
+                              checked={selectedWearClass.includes(wc)}
+                              onCheckedChange={() => toggleWearClass(wc)}
+                            />
+                            <label htmlFor={`wear-${wc}`} className="text-sm cursor-pointer">
+                              {wc}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Размер доски - толщина, мм</h4>
+                      <div className="flex gap-2">
+                        <Input 
+                          type="number" 
+                          placeholder="От"
+                          value={thicknessRange[0]}
+                          onChange={(e) => setThicknessRange([e.target.value, thicknessRange[1]])}
+                          className="text-sm"
+                        />
+                        <Input 
+                          type="number" 
+                          placeholder="До"
+                          value={thicknessRange[1]}
+                          onChange={(e) => setThicknessRange([thicknessRange[0], e.target.value])}
+                          className="text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Размер доски - ширина, мм</h4>
+                      <div className="flex gap-2">
+                        <Input 
+                          type="number" 
+                          placeholder="От"
+                          value={widthRange[0]}
+                          onChange={(e) => setWidthRange([e.target.value, widthRange[1]])}
+                          className="text-sm"
+                        />
+                        <Input 
+                          type="number" 
+                          placeholder="До"
+                          value={widthRange[1]}
+                          onChange={(e) => setWidthRange([widthRange[0], e.target.value])}
+                          className="text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Размер доски - длина, мм</h4>
+                      <div className="flex gap-2">
+                        <Input 
+                          type="number" 
+                          placeholder="От"
+                          value={lengthRange[0]}
+                          onChange={(e) => setLengthRange([e.target.value, lengthRange[1]])}
+                          className="text-sm"
+                        />
+                        <Input 
+                          type="number" 
+                          placeholder="До"
+                          value={lengthRange[1]}
+                          onChange={(e) => setLengthRange([lengthRange[0], e.target.value])}
+                          className="text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Цена, ₽/м²</h4>
+                      <div className="flex gap-2 mb-3">
+                        <Input 
+                          type="number" 
+                          placeholder="От"
+                          value={priceRange[0]}
+                          onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                          className="text-sm"
+                        />
+                        <Input 
+                          type="number" 
+                          placeholder="До"
+                          value={priceRange[1]}
+                          onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                          className="text-sm"
+                        />
+                      </div>
+                      <Slider 
+                        min={0}
+                        max={10000}
+                        step={100}
+                        value={priceRange}
+                        onValueChange={setPriceRange}
+                        className="mb-2"
+                      />
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Влагостойкость покрытий пола</h4>
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
                           <Checkbox 
-                            id={manufacturer}
-                            checked={selectedManufacturers.includes(manufacturer)}
-                            onCheckedChange={() => toggleManufacturer(manufacturer)}
+                            id="waterproof-yes"
+                            checked={waterproof === 'yes'}
+                            onCheckedChange={() => setWaterproof(waterproof === 'yes' ? 'all' : 'yes')}
                           />
-                          <label htmlFor={manufacturer} className="text-sm cursor-pointer">
-                            {manufacturer}
-                          </label>
+                          <label htmlFor="waterproof-yes" className="text-sm cursor-pointer">Да</label>
                         </div>
-                      ))}
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="waterproof-no"
+                            checked={waterproof === 'no'}
+                            onCheckedChange={() => setWaterproof(waterproof === 'no' ? 'all' : 'no')}
+                          />
+                          <label htmlFor="waterproof-no" className="text-sm cursor-pointer">Нет</label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Подходит для тёплого пола</h4>
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="heating-yes"
+                            checked={underfloorHeating === 'yes'}
+                            onCheckedChange={() => setUnderfloorHeating(underfloorHeating === 'yes' ? 'all' : 'yes')}
+                          />
+                          <label htmlFor="heating-yes" className="text-sm cursor-pointer">Применяется</label>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  <Button 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => {
-                      setSelectedCategory('all');
-                      setPriceRange([0, 5000]);
-                      setSelectedManufacturers([]);
-                      setSearchQuery('');
-                    }}
-                  >
-                    <Icon name="RotateCcw" size={16} className="mr-2" />
-                    Сбросить
-                  </Button>
+                  <div className="mt-6 pt-4 border-t space-y-2">
+                    <Button className="w-full bg-accent hover:bg-accent/90">
+                      <Icon name="Check" size={16} className="mr-2" />
+                      Показать
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={resetFilters}
+                    >
+                      <Icon name="RotateCcw" size={16} className="mr-2" />
+                      Сбросить
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </aside>
