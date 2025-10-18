@@ -35,6 +35,9 @@ interface Product {
   selection?: string;
   waterproof?: boolean;
   underfloorHeating?: boolean;
+  installMethod?: string;
+  clearance?: boolean;
+  surface?: string;
 }
 
 const categories = [
@@ -75,22 +78,36 @@ const woodTypes = [
 const wearClasses = ['31 класс', '32 класс', '33 класс', '34 класс'];
 
 const patterns = [
-  'Однополосный', 'Двухполосный', 'Трёхполосный', 'Многополосный', 
-  'Ёлочкой', 'С рисунком', 'Под плитку, камень'
+  'Однополосный паркет', 'Однополосный', 'Двухполосный паркет', 'Двухполосный',
+  'Трёхполосный паркет', 'Многополосный паркет', 'Ёлочкой паркет', 'Ёлочкой',
+  'С рисунком (модульный, художественный)', 'Под плитку, камень', 'С узором'
 ];
 
 const bevels = ['Фаска 4v', 'Минифаска 4v', 'Фаска 2v', 'Без фаски'];
 
+const finishTypes = ['ламинат', 'SPC КварцВинил'];
+
 const sheens = ['Матовый', 'Полуматовый (стандартный)', 'Глянцевый', 'Полуглянцевый'];
+
+const surfaces = [
+  'Глянцевая', 'Полуматовая', 'Матовая', '"Потёртый" рисунок',
+  'Волнистая', 'Глубокий регистр'
+];
 
 const shades = ['Светлый оттенок', 'Средний оттенок', 'Тёмный оттенок'];
 
 const colors = [
-  'белые / бежевые оттенки цвета', 'Коричневые / красные оттенки цвета',
-  'Натуральные оттенки цвета', 'Серые оттенки цвета', 'Чёрные / тёмные оттенки цвета'
+  'белые / бежевые оттенки цвета', 'Зелёный', 'Коричневые / красные оттенки цвета',
+  'Натуральные оттенки цвета', 'не определён оттенок цвета', 'Серые оттенки цвета',
+  'Синий / голубой', 'Чёрные / тёмные оттенки цвета'
 ];
 
 const selections = ['Кантри', 'Рустик', 'Натур', 'Селект'];
+
+const installMethods = [
+  'Плавающая укладка, на подложку, на замках',
+  'На клей'
+];
 
 const products: Product[] = [
   {
@@ -202,12 +219,16 @@ export default function Index() {
   const [selectedPattern, setSelectedPattern] = useState<string[]>([]);
   const [selectedBevel, setSelectedBevel] = useState<string[]>([]);
   const [brushed, setBrushed] = useState<string>('all');
+  const [selectedFinish, setSelectedFinish] = useState<string[]>([]);
   const [selectedSheen, setSelectedSheen] = useState<string[]>([]);
+  const [selectedSurface, setSelectedSurface] = useState<string[]>([]);
   const [selectedShade, setSelectedShade] = useState<string[]>([]);
   const [selectedColor, setSelectedColor] = useState<string[]>([]);
   const [selectedSelection, setSelectedSelection] = useState<string[]>([]);
   const [waterproof, setWaterproof] = useState<string>('all');
   const [underfloorHeating, setUnderfloorHeating] = useState<string>('all');
+  const [selectedInstallMethod, setSelectedInstallMethod] = useState<string[]>([]);
+  const [clearanceOnly, setClearanceOnly] = useState<boolean>(false);
   
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -302,6 +323,60 @@ export default function Index() {
     }
   };
 
+  const togglePattern = (pattern: string) => {
+    setSelectedPattern(prev => 
+      prev.includes(pattern) ? prev.filter(p => p !== pattern) : [...prev, pattern]
+    );
+  };
+
+  const toggleBevel = (bevel: string) => {
+    setSelectedBevel(prev => 
+      prev.includes(bevel) ? prev.filter(b => b !== bevel) : [...prev, bevel]
+    );
+  };
+
+  const toggleFinish = (finish: string) => {
+    setSelectedFinish(prev => 
+      prev.includes(finish) ? prev.filter(f => f !== finish) : [...prev, finish]
+    );
+  };
+
+  const toggleSheen = (sheen: string) => {
+    setSelectedSheen(prev => 
+      prev.includes(sheen) ? prev.filter(s => s !== sheen) : [...prev, sheen]
+    );
+  };
+
+  const toggleSurface = (surface: string) => {
+    setSelectedSurface(prev => 
+      prev.includes(surface) ? prev.filter(s => s !== surface) : [...prev, surface]
+    );
+  };
+
+  const toggleShade = (shade: string) => {
+    setSelectedShade(prev => 
+      prev.includes(shade) ? prev.filter(s => s !== shade) : [...prev, shade]
+    );
+  };
+
+  const toggleColor = (color: string) => {
+    setSelectedColor(prev => 
+      prev.includes(color) ? prev.filter(c => c !== color) : [...prev, color]
+    );
+  };
+
+  const toggleSelection = (selection: string) => {
+    setSelectedSelection(prev => 
+      prev.includes(selection) ? prev.filter(s => s !== selection) : [...prev, selection]
+    );
+  };
+
+  const toggleInstallMethod = (method: string) => {
+    setSelectedInstallMethod(prev => 
+      prev.includes(method) ? prev.filter(m => m !== method) : [...prev, method]
+    );
+  };
+
   const resetFilters = () => {
     setSelectedCategory('all');
     setPriceRange([0, 10000]);
@@ -316,12 +391,16 @@ export default function Index() {
     setSelectedPattern([]);
     setSelectedBevel([]);
     setBrushed('all');
+    setSelectedFinish([]);
     setSelectedSheen([]);
+    setSelectedSurface([]);
     setSelectedShade([]);
     setSelectedColor([]);
     setSelectedSelection([]);
     setWaterproof('all');
     setUnderfloorHeating('all');
+    setSelectedInstallMethod([]);
+    setClearanceOnly(false);
     setSearchQuery('');
   };
 
@@ -704,6 +783,156 @@ export default function Index() {
                     </div>
 
                     <div>
+                      <h4 className="font-semibold mb-3 text-sm">Количество полос, рисунок</h4>
+                      <div className="space-y-2 max-h-40 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                        {patterns.map(pattern => (
+                          <div key={pattern} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`pattern-${pattern}`}
+                              checked={selectedPattern.includes(pattern)}
+                              onCheckedChange={() => togglePattern(pattern)}
+                            />
+                            <label htmlFor={`pattern-${pattern}`} className="text-sm cursor-pointer">{pattern}</label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Фаска по периметру доски</h4>
+                      <div className="space-y-2">
+                        {bevels.map(bevel => (
+                          <div key={bevel} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`bevel-${bevel}`}
+                              checked={selectedBevel.includes(bevel)}
+                              onCheckedChange={() => toggleBevel(bevel)}
+                            />
+                            <label htmlFor={`bevel-${bevel}`} className="text-sm cursor-pointer">{bevel}</label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Браширование планки</h4>
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="brushed-yes"
+                            checked={brushed === 'yes'}
+                            onCheckedChange={() => setBrushed(brushed === 'yes' ? 'all' : 'yes')}
+                          />
+                          <label htmlFor="brushed-yes" className="text-sm cursor-pointer">Есть</label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="brushed-no"
+                            checked={brushed === 'no'}
+                            onCheckedChange={() => setBrushed(brushed === 'no' ? 'all' : 'no')}
+                          />
+                          <label htmlFor="brushed-no" className="text-sm cursor-pointer">Нету</label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Финишное покрытие пола</h4>
+                      <div className="space-y-2">
+                        {finishTypes.map(finish => (
+                          <div key={finish} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`finish-${finish}`}
+                              checked={selectedFinish.includes(finish)}
+                              onCheckedChange={() => toggleFinish(finish)}
+                            />
+                            <label htmlFor={`finish-${finish}`} className="text-sm cursor-pointer">{finish}</label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Уровень, степень блеска</h4>
+                      <div className="space-y-2">
+                        {sheens.map(sheen => (
+                          <div key={sheen} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`sheen-${sheen}`}
+                              checked={selectedSheen.includes(sheen)}
+                              onCheckedChange={() => toggleSheen(sheen)}
+                            />
+                            <label htmlFor={`sheen-${sheen}`} className="text-sm cursor-pointer">{sheen}</label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Поверхность полов, дизайн</h4>
+                      <div className="space-y-2 max-h-32 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                        {surfaces.map(surface => (
+                          <div key={surface} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`surface-${surface}`}
+                              checked={selectedSurface.includes(surface)}
+                              onCheckedChange={() => toggleSurface(surface)}
+                            />
+                            <label htmlFor={`surface-${surface}`} className="text-sm cursor-pointer">{surface}</label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Оттенок (тон) цвета</h4>
+                      <div className="space-y-2">
+                        {shades.map(shade => (
+                          <div key={shade} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`shade-${shade}`}
+                              checked={selectedShade.includes(shade)}
+                              onCheckedChange={() => toggleShade(shade)}
+                            />
+                            <label htmlFor={`shade-${shade}`} className="text-sm cursor-pointer">{shade}</label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Цвет</h4>
+                      <div className="space-y-2 max-h-40 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                        {colors.map(color => (
+                          <div key={color} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`color-${color}`}
+                              checked={selectedColor.includes(color)}
+                              onCheckedChange={() => toggleColor(color)}
+                            />
+                            <label htmlFor={`color-${color}`} className="text-sm cursor-pointer">{color}</label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Селекция дерева</h4>
+                      <div className="space-y-2">
+                        {selections.map(selection => (
+                          <div key={selection} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`selection-${selection}`}
+                              checked={selectedSelection.includes(selection)}
+                              onCheckedChange={() => toggleSelection(selection)}
+                            />
+                            <label htmlFor={`selection-${selection}`} className="text-sm cursor-pointer">{selection}</label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
                       <h4 className="font-semibold mb-3 text-sm">Влагостойкость покрытий пола</h4>
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
@@ -735,6 +964,36 @@ export default function Index() {
                             onCheckedChange={() => setUnderfloorHeating(underfloorHeating === 'yes' ? 'all' : 'yes')}
                           />
                           <label htmlFor="heating-yes" className="text-sm cursor-pointer">Применяется</label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Способ укладки</h4>
+                      <div className="space-y-2">
+                        {installMethods.map(method => (
+                          <div key={method} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`install-${method}`}
+                              checked={selectedInstallMethod.includes(method)}
+                              onCheckedChange={() => toggleInstallMethod(method)}
+                            />
+                            <label htmlFor={`install-${method}`} className="text-sm cursor-pointer">{method}</label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Распродажа остатков</h4>
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="clearance"
+                            checked={clearanceOnly}
+                            onCheckedChange={(checked) => setClearanceOnly(checked as boolean)}
+                          />
+                          <label htmlFor="clearance" className="text-sm cursor-pointer">Только распродажа</label>
                         </div>
                       </div>
                     </div>
