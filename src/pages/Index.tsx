@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -128,6 +129,7 @@ interface CartItem extends Product {
 }
 
 export default function Index() {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [priceRange, setPriceRange] = useState<number[]>([0, 5000]);
   const [selectedManufacturers, setSelectedManufacturers] = useState<string[]>([]);
@@ -485,8 +487,9 @@ export default function Index() {
                 {filteredProducts.map((product, index) => (
                   <Card 
                     key={product.id} 
-                    className="overflow-hidden hover:shadow-lg transition-all animate-scale-in group"
+                    className="overflow-hidden hover:shadow-lg transition-all animate-scale-in group cursor-pointer"
                     style={{ animationDelay: `${index * 0.05}s` }}
+                    onClick={() => navigate(`/product/${product.id}`)}
                   >
                     <div className="relative h-48 overflow-hidden bg-muted">
                       <img 
@@ -516,7 +519,10 @@ export default function Index() {
                         </div>
                         <Button 
                           size="sm"
-                          onClick={() => addToCart(product)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            addToCart(product);
+                          }}
                           className="bg-accent hover:bg-accent/90"
                         >
                           <Icon name="ShoppingCart" size={16} />
