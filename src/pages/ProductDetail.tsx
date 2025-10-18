@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import Icon from '@/components/ui/icon';
 
 interface Product {
@@ -173,33 +176,124 @@ const products: Product[] = [
   }
 ];
 
-const relatedProducts = [
-  {
-    id: 101,
-    name: 'Плинтус МДФ 80мм',
-    price: 250,
-    image: 'https://cdn.poehali.dev/projects/fef60a18-ca2d-4971-b39f-f5fa5ea7d2cc/files/058a28e9-bc95-4823-b429-3efa8abd586e.jpg'
-  },
-  {
-    id: 102,
-    name: 'Подложка 3мм',
-    price: 180,
-    image: 'https://cdn.poehali.dev/projects/fef60a18-ca2d-4971-b39f-f5fa5ea7d2cc/files/439d699e-9656-4612-b3e0-dbd98d0df771.jpg'
-  },
-  {
-    id: 103,
-    name: 'Порожек алюминиевый',
-    price: 320,
-    image: 'https://cdn.poehali.dev/projects/fef60a18-ca2d-4971-b39f-f5fa5ea7d2cc/files/d158a67a-f436-4afb-841b-32ee2b6e47b1.jpg'
-  }
+const accessoryProducts = [
+  { id: 101, name: 'Подложка пробковая 3мм', category: 'underlay', price: 280, image: 'https://cdn.poehali.dev/projects/fef60a18-ca2d-4971-b39f-f5fa5ea7d2cc/files/058a28e9-bc95-4823-b429-3efa8abd586e.jpg' },
+  { id: 102, name: 'Плинтус МДФ 80мм Дуб', category: 'baseboard', price: 250, image: 'https://cdn.poehali.dev/projects/fef60a18-ca2d-4971-b39f-f5fa5ea7d2cc/files/439d699e-9656-4612-b3e0-dbd98d0df771.jpg' },
+  { id: 103, name: 'Порожек алюминиевый 30мм', category: 'threshold', price: 320, image: 'https://cdn.poehali.dev/projects/fef60a18-ca2d-4971-b39f-f5fa5ea7d2cc/files/d158a67a-f436-4afb-841b-32ee2b6e47b1.jpg' },
+  { id: 104, name: 'Паркетный лак Bona Traffic', category: 'varnish', price: 3450, image: 'https://cdn.poehali.dev/projects/fef60a18-ca2d-4971-b39f-f5fa5ea7d2cc/files/058a28e9-bc95-4823-b429-3efa8abd586e.jpg' },
+  { id: 105, name: 'Масло Osmo Original 3062', category: 'oil', price: 2890, image: 'https://cdn.poehali.dev/projects/fef60a18-ca2d-4971-b39f-f5fa5ea7d2cc/files/439d699e-9656-4612-b3e0-dbd98d0df771.jpg' },
+  { id: 106, name: 'Грунтовка Bona Prime', category: 'primer', price: 1650, image: 'https://cdn.poehali.dev/projects/fef60a18-ca2d-4971-b39f-f5fa5ea7d2cc/files/d158a67a-f436-4afb-841b-32ee2b6e47b1.jpg' },
+  { id: 107, name: 'Клей Uzin MK 92 S', category: 'glue', price: 4200, image: 'https://cdn.poehali.dev/projects/fef60a18-ca2d-4971-b39f-f5fa5ea7d2cc/files/058a28e9-bc95-4823-b429-3efa8abd586e.jpg' },
+  { id: 108, name: 'Средство по уходу Bona Cleaner', category: 'care', price: 890, image: 'https://cdn.poehali.dev/projects/fef60a18-ca2d-4971-b39f-f5fa5ea7d2cc/files/439d699e-9656-4612-b3e0-dbd98d0df771.jpg' },
+  { id: 109, name: 'Подложка XPS 5мм', category: 'underlay', price: 450, image: 'https://cdn.poehali.dev/projects/fef60a18-ca2d-4971-b39f-f5fa5ea7d2cc/files/d158a67a-f436-4afb-841b-32ee2b6e47b1.jpg' },
+  { id: 110, name: 'Плинтус шпон Ясень 60мм', category: 'baseboard', price: 380, image: 'https://cdn.poehali.dev/projects/fef60a18-ca2d-4971-b39f-f5fa5ea7d2cc/files/058a28e9-bc95-4823-b429-3efa8abd586e.jpg' },
+  { id: 111, name: 'Порожек латунный 40мм', category: 'threshold', price: 520, image: 'https://cdn.poehali.dev/projects/fef60a18-ca2d-4971-b39f-f5fa5ea7d2cc/files/439d699e-9656-4612-b3e0-dbd98d0df771.jpg' }
 ];
+
+function shuffleArray<T>(array: T[]): T[] {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
+}
+
+interface ProductCarouselProps {
+  title: string;
+  products: any[];
+  onProductClick: (id: number) => void;
+}
+
+function ProductCarousel({ title, products, onProductClick }: ProductCarouselProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const scrollAmount = 300;
+      scrollRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  return (
+    <div className="relative">
+      <h3 className="text-2xl font-bold font-heading mb-6">{title}</h3>
+      <div className="relative group">
+        <Button
+          variant="outline"
+          size="icon"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-white shadow-lg"
+          onClick={() => scroll('left')}
+        >
+          <Icon name="ChevronLeft" size={20} />
+        </Button>
+        <div
+          ref={scrollRef}
+          className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {products.map((item) => (
+            <Card
+              key={item.id}
+              className="flex-shrink-0 w-40 hover:shadow-lg transition-all cursor-pointer"
+              onClick={() => onProductClick(item.id)}
+            >
+              <CardContent className="p-3">
+                <div className="aspect-square rounded-lg overflow-hidden bg-muted mb-3">
+                  <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                </div>
+                <h4 className="font-semibold text-xs mb-2 line-clamp-2 min-h-[2rem]">{item.name}</h4>
+                <div className="text-sm font-bold text-accent">{item.price} ₽</div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <Button
+          variant="outline"
+          size="icon"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-white shadow-lg"
+          onClick={() => scroll('right')}
+        >
+          <Icon name="ChevronRight" size={20} />
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
+  const [orderDialogOpen, setOrderDialogOpen] = useState(false);
+  const [viewedProducts, setViewedProducts] = useState<Product[]>([]);
+  const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
+  const [accessories, setAccessories] = useState<any[]>([]);
 
   const product = products.find(p => p.id === Number(id));
+
+  useEffect(() => {
+    if (product) {
+      const viewed = JSON.parse(localStorage.getItem('viewedProducts') || '[]');
+      const updatedViewed = [product.id, ...viewed.filter((vid: number) => vid !== product.id)].slice(0, 11);
+      localStorage.setItem('viewedProducts', JSON.stringify(updatedViewed));
+      
+      const viewedProductsList = updatedViewed
+        .map((vid: number) => products.find(p => p.id === vid))
+        .filter(Boolean) as Product[];
+      setViewedProducts(viewedProductsList);
+
+      const similar = products.filter(p => 
+        p.id !== product.id && p.manufacturer === product.manufacturer
+      );
+      setSimilarProducts(shuffleArray(similar).slice(0, 11));
+
+      setAccessories(shuffleArray(accessoryProducts).slice(0, 11));
+    }
+  }, [product]);
 
   if (!product) {
     return (
@@ -227,7 +321,7 @@ export default function ProductDetail() {
                 Назад в каталог
               </Button>
             </div>
-            <h1 className="text-2xl font-bold font-heading text-primary">ProfParket</h1>
+            <h1 className="text-2xl font-bold font-heading text-primary">Главпаркет</h1>
             <a href="tel:+74951234567" className="flex items-center gap-2 text-sm font-medium">
               <Icon name="Phone" size={18} />
               <span className="hidden md:inline">+7 (495) 123-45-67</span>
@@ -338,10 +432,48 @@ export default function ProductDetail() {
                 </div>
 
                 <div className="flex gap-3">
-                  <Button size="lg" className="flex-1 bg-accent hover:bg-accent/90">
-                    <Icon name="ShoppingCart" size={20} className="mr-2" />
-                    Добавить в корзину
-                  </Button>
+                  <Dialog open={orderDialogOpen} onOpenChange={setOrderDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="lg" className="flex-1 bg-accent hover:bg-accent/90">
+                        <Icon name="ShoppingCart" size={20} className="mr-2" />
+                        Оформить заказ
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                      <DialogHeader>
+                        <DialogTitle>Оформление заказа</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="name">Имя</Label>
+                          <Input id="name" placeholder="Введите ваше имя" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="phone">Телефон</Label>
+                          <Input id="phone" type="tel" placeholder="+7 (___) ___-__-__" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="email">Email</Label>
+                          <Input id="email" type="email" placeholder="your@email.com" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="address">Адрес доставки</Label>
+                          <Input id="address" placeholder="Введите адрес" />
+                        </div>
+                        <div className="bg-muted p-4 rounded-lg">
+                          <p className="text-sm mb-2">Ваш заказ:</p>
+                          <p className="font-semibold">{product.name}</p>
+                          <p className="text-sm text-muted-foreground">Количество: {quantity} м²</p>
+                          <p className="text-lg font-bold text-accent mt-2">
+                            Итого: {(product.price * quantity).toLocaleString()} ₽
+                          </p>
+                        </div>
+                        <Button className="w-full bg-accent hover:bg-accent/90" onClick={() => setOrderDialogOpen(false)}>
+                          Подтвердить заказ
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                   <Button variant="outline" size="lg">
                     <Icon name="Heart" size={20} />
                   </Button>
@@ -481,33 +613,43 @@ export default function ProductDetail() {
         </div>
       </section>
 
-      <section className="py-12 bg-background">
-        <div className="container mx-auto px-4">
-          <h3 className="text-2xl font-bold font-heading mb-8">С этим товаром покупают</h3>
-          <div className="grid md:grid-cols-3 gap-6">
-            {relatedProducts.map((item) => (
-              <Card key={item.id} className="hover:shadow-lg transition-all">
-                <CardContent className="p-4">
-                  <div className="aspect-square rounded-lg overflow-hidden bg-muted mb-4">
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                  </div>
-                  <h4 className="font-semibold mb-2">{item.name}</h4>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xl font-bold text-accent">{item.price} ₽</span>
-                    <Button size="sm" variant="outline">
-                      <Icon name="Plus" size={16} />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+      {similarProducts.length > 0 && (
+        <section className="py-12 bg-background">
+          <div className="container mx-auto px-4">
+            <ProductCarousel
+              title="Похожие товары"
+              products={similarProducts}
+              onProductClick={(id) => navigate(`/product/${id}`)}
+            />
           </div>
+        </section>
+      )}
+
+      <section className="py-12 bg-white">
+        <div className="container mx-auto px-4">
+          <ProductCarousel
+            title="С этим товаром покупают"
+            products={accessories}
+            onProductClick={(id) => navigate(`/product/${id}`)}
+          />
         </div>
       </section>
 
+      {viewedProducts.length > 1 && (
+        <section className="py-12 bg-background">
+          <div className="container mx-auto px-4">
+            <ProductCarousel
+              title="Вы смотрели"
+              products={viewedProducts.filter(p => p.id !== product.id)}
+              onProductClick={(id) => navigate(`/product/${id}`)}
+            />
+          </div>
+        </section>
+      )}
+
       <footer className="bg-primary text-white py-8">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-white/70">&copy; 2024 ProfParket. Все права защищены.</p>
+          <p className="text-white/70">&copy; 2024 Главпаркет. Все права защищены.</p>
         </div>
       </footer>
     </div>

@@ -198,7 +198,7 @@ export default function Index() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-8">
-              <h1 className="text-2xl font-bold font-heading text-primary">ProfParket</h1>
+              <h1 className="text-2xl font-bold font-heading text-primary">Главпаркет</h1>
               <nav className="hidden md:flex gap-6">
                 <button 
                   onClick={() => setShowCalculator(true)}
@@ -594,7 +594,7 @@ export default function Index() {
       <section id="about" className="py-16 bg-background">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h3 className="text-3xl font-bold font-heading mb-6">О компании ProfParket</h3>
+            <h3 className="text-3xl font-bold font-heading mb-6">О компании Главпаркет</h3>
             <p className="text-lg text-muted-foreground mb-8">
               Более 15 лет мы специализируемся на продаже и укладке напольных покрытий премиум-класса. 
               Работаем только с проверенными производителями и предоставляем полный цикл услуг.
@@ -681,7 +681,7 @@ export default function Index() {
 
       <footer className="bg-primary/95 text-white py-8">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-white/70">&copy; 2024 ProfParket. Все права защищены.</p>
+          <p className="text-white/70">&copy; 2024 Главпаркет. Все права защищены.</p>
         </div>
       </footer>
     </div>
